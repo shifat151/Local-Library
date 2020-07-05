@@ -3,6 +3,8 @@ from . models import Book, Author, BookInstance, Genre
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 # Create your views here.
@@ -60,11 +62,12 @@ class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
 
 
-class LoanedBooksByLibrarianListView(LoginRequiredMixin,generic.ListView):
-    """Generic class-based view listing books on loan to current user."""
+class LoanedBooksAllListView(PermissionRequiredMixin, generic.ListView):
+    """Generic class-based view listing all books on loan. Only visible to users with can_mark_returned permission."""
     model = BookInstance
-    template_name ='catalogue/bookinstance_list_borrowed_librarian.html'
+    permission_required = 'catalogue.can_mark_returned'
+    template_name = 'catalogue/bookinstance_list_borrowed_librarian.html'
     paginate_by = 10
-    
+
     def get_queryset(self):
-        return BookInstance.objects.all().order_by('due_back')
+        return BookInstance.objects.filter(status__exact='o').order_by('due_back')

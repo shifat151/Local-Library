@@ -7,7 +7,9 @@
     <ul>
 
       {% for bookinst in bookinstance_list %} 
-      {% if  bookinst.LOAN_STATUS == 'o'%}
+
+      {% if  bookinst.status == 'o'%}
+
       <li class="{% if bookinst.is_overdue %}text-danger{% endif %}">
         <a href="{% url 'book-detail' bookinst.book.pk %}">{{bookinst.book.title}}</a> ({{ bookinst.due_back }}) borrowed by -{{ bookinst.borrower }}      
       </li>
